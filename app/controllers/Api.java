@@ -6,16 +6,14 @@ import java.util.Random;
 
 import org.codehaus.jackson.node.ObjectNode;
 
-import play.*;
 import play.libs.Json;
 import play.mvc.*;
 
-import views.html.*;
 
 public class Api extends Controller {
 
 	
-	//TODO finish exception cases
+	//TODO finish exception cases description
 	/**
 	 * Uses 'min' and 'max parameters' and generates an Integer between them
 	 * 
@@ -59,7 +57,7 @@ public class Api extends Controller {
 			
 			// Generates the integer using min as max if the order was wrong. Adds error message though
 			if ( minValue > maxValue ) {
-				errorMessage += "Max value is less than the Min value ";
+				errorMessage += "Max value is less than the Min value. Values are swapped";
 			}
 		}
 		
@@ -70,7 +68,7 @@ public class Api extends Controller {
 		long range = (long)maxValue - (long)minValue + 1;
 		int random = (int)( range * randomGenerator.nextDouble() + minValue );
 		
-		// Building JSON ro return
+		// Building JSON return
 		
 		ObjectNode randNumJSON = Json.newObject();
 		randNumJSON.put("random_integer", random);
@@ -78,12 +76,9 @@ public class Api extends Controller {
 		if( !errorMessage.equals("") )
 			randNumJSON.put("error_message", errorMessage);
 		
+		response().setHeader("X-Mashape-Billing", "queries=1");
 		return ok(randNumJSON);
-		
-//		return ok(index.render("Random number will be generated here. Min:" + minValue + 
-//											" Max:" + maxValue + " Random:" + random + " ErrorMSG:" + 
-//											errorMessage + "TS:" + paramsToString  ));
-		
+	
 	 
 	}
 	
