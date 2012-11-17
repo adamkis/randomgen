@@ -12,10 +12,13 @@ import play.mvc.*;
 
 public class Api extends Controller {
 
-	
-	//TODO finish exception cases description
 	/**
-	 * Uses 'min' and 'max parameters' and generates an Integer between them
+	 * Uses 'min' and 'max parameters' and generates an Integer between them.
+	 * If no parameter is given for min/max values, or
+	 * the parameter for min or max is unparseable for Integer, then:
+	 * 				 Integer.MIN_VALUE / .MAX_VALUE is used.
+	 * If there is no parameter for min and max values, but a useless parameter name is given,
+	 * then it is ignored, and the random number is generated using Integer.MIN_VALUE and .MAX_VALUE
 	 * 
 	 * @return - Random Integer generated
 	 */
@@ -76,7 +79,10 @@ public class Api extends Controller {
 		if( !errorMessage.equals("") )
 			randNumJSON.put("error_message", errorMessage);
 		
+		// increment query count for billing
 		response().setHeader("X-Mashape-Billing", "queries=1");
+		
+		
 		return ok(randNumJSON);
 	
 	 
