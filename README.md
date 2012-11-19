@@ -1,1 +1,3 @@
+# Randomgen
+
 This is a Play application for an API generating random numbers.
