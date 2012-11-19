@@ -9,5 +9,5 @@ GET     /                           controllers.Application.index()
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
 
 # API Random Generator
-GET     /api/random                 controllers.Api.random()
-GET     /api/random/                controllers.Api.random()
+GET     /api/random                 controllers.Api.random(min:Integer ?= null, max:Integer ?= null)
+GET     /api/random/                controllers.Api.random(min:Integer ?= null, max:Integer ?= null)

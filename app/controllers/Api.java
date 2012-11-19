@@ -1,14 +1,13 @@
 package controllers;
 
 
-import java.util.Map;
 import java.util.Random;
 
 import org.codehaus.jackson.node.ObjectNode;
 
 import play.libs.Json;
-import play.mvc.*;
-
+import play.mvc.Controller;
+import play.mvc.Result;
 
 public class Api extends Controller {
 
@@ -22,70 +21,23 @@ public class Api extends Controller {
 	 * 
 	 * @return - Random Integer generated
 	 */
-	public static Result random() {
-			
-		int minValue = Integer.MIN_VALUE;
-		int maxValue = Integer.MAX_VALUE;
-		String errorMessage = "";
+	public static Result random(Integer min, Integer max) {
+		int minValue = (min == null) ? Integer.MIN_VALUE : min;
+		int maxValue = (max == null) ? Integer.MAX_VALUE : max;
 		
-		if(! request().queryString().isEmpty() ){
+		ObjectNode result = Json.newObject();
 		
-			Map<String, String[]> urlParams = request().queryString();
-			
-			if( urlParams.containsKey("min") ){
-				try {
-					// If more parameters have the name min, we take the first, ignore the others
-					// Trimming handles if the the number starts with a '+' sign -> URL decoding would
-					// convert it to a space
-					minValue = Integer.parseInt(urlParams.get("min")[0].trim()); 
-				} catch (NumberFormatException e) {
-					errorMessage += "Min value cannot be parsed. Using Integer minimum value ";
-				}
-			}
-			
-			if( urlParams.containsKey("max") ){
-				try {
-					// If more parameters have the name max, we take the first, ignore the others
-					// Trimming handles if the the number starts with a '+' sign -> URL decoding would
-					// convert it to a space
-					maxValue = Integer.parseInt(urlParams.get("max")[0].trim()); // ignore all the other values
-				} catch (NumberFormatException e) {
-					errorMessage += "Max value cannot be parsed. Using Integer maximum value ";
-				}
-			}
-			
-			//There was no min or max param, but a useless one was given
-			if( !urlParams.containsKey("min") && !urlParams.containsKey("max") )
-				errorMessage += "Query parameter is useless ";
-			
-			// Generates the integer using min as max if the order was wrong. Adds error message though
-			if ( minValue > maxValue ) {
-				errorMessage += "Max value is less than the Min value. Values are swapped";
-			}
+		if ((maxValue - minValue + 1) <= 0) {
+			result.put("error_message", "Invalid Min and Max values");
+			return badRequest(result);
 		}
 		
-		//Generating Random number
+		int random = new Random().nextInt(maxValue - minValue + 1) + minValue;
 		
-		Random randomGenerator = new Random();
-		
-		long range = (long)maxValue - (long)minValue + 1;
-		int random = (int)( range * randomGenerator.nextDouble() + minValue );
-		
-		// Building JSON return
-		
-		ObjectNode randNumJSON = Json.newObject();
-		randNumJSON.put("random_integer", random);
-		
-		if( !errorMessage.equals("") )
-			randNumJSON.put("error_message", errorMessage);
-		
-		// increment query count for billing
 		response().setHeader("X-Mashape-Billing", "queries=1");
 		
-		
-		return ok(randNumJSON);
-	
-	 
+		result.put("random_integer", random);
+		return ok(result);
 	}
 	
 
